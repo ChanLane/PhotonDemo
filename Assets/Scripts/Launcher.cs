@@ -32,6 +32,18 @@ namespace chandler.scripts
         
         #endregion
 
+        #region Public Fields
+        
+        [Tooltip("THE UI to inform the user that the connection is in progress")]
+        [SerializeField]
+        private GameObject progressLabel;
+        
+        [Tooltip("The UI panel to let the user enter name, connect and play")]
+        [SerializeField]
+        private GameObject controlPanel;
+
+        #endregion
+
 
         #region MonoBehavior Callbacks
 
@@ -44,7 +56,13 @@ namespace chandler.scripts
             
              PhotonNetwork.AutomaticallySyncScene = true;
         }
-        
+
+        private void Start()
+        {
+            progressLabel.SetActive(false);
+            controlPanel.SetActive(true);
+        }
+
         #endregion
 
         #region PublicMethods
@@ -55,6 +73,8 @@ namespace chandler.scripts
 
         public void Connect()
         {
+            progressLabel.SetActive(true);
+            controlPanel.SetActive(false);
             
             // we check if we are connected or not, we join if we are, else we initiate connection to the server
             if (PhotonNetwork.IsConnected)
@@ -85,6 +105,8 @@ namespace chandler.scripts
 
       public override void OnDisconnected(DisconnectCause cause)
       {
+          progressLabel.SetActive(false);
+          controlPanel.SetActive(true);
           Debug.LogWarningFormat("PUN Basics Tutorial/Launcher: OnDisconnected() was called by PUN with reason {0}", cause); 
       }
 
