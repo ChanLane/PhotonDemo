@@ -51,7 +51,7 @@ namespace chandler.scripts
 
         // start the connection process.
         // - if already connected, we attempt joining a random room
-        // - if not yet connected, Connect this application instance to Photon Cloud Network
+        // - if not yet connected,Connect this application instance to Photon Cloud Network
 
         public void Connect()
         {
