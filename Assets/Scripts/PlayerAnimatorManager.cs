@@ -32,6 +32,15 @@ namespace ChandlerLane.Scripts
 
         private void Update()
         {
+            AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
+            if (stateInfo.IsName("Base Layer.Run"))
+            {
+                if (Input.GetButtonDown("Fire2"))
+                {
+                    _animator.SetTrigger("Jump");
+                }
+            }
+            
             if (!_animator)
             {
                 return;
