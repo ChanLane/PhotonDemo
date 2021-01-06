@@ -8,6 +8,14 @@ namespace ChandlerLane.Scripts
 {
     public class PlayerManager : MonoBehaviourPun, IPunObservable
     {
+
+        #region Public Fields
+
+        [Tooltip("The local player instance. Use this to know if the local player is represented in the scene.")]
+        public static GameObject LocalPlayerInstance;
+
+        #endregion
+        
         #region Private Fields
 
         [Tooltip("The Beams GameObject to control")] [SerializeField]
@@ -42,8 +50,36 @@ namespace ChandlerLane.Scripts
         
         #region MonoBehaviour Callbacks
 
+#if UNITY_5_4_OR_NEWER
+        void OnlevelWasLoaded(int Level)
+        {
+            this.CalledOnLevelWasLoaded(Level);
+        }
+#endif
+        void CalledOnLevelWasLoaded(int level)
+        {
+            if (!Physics.Raycast(transform.position, -Vector3.up, 5f))
+            {
+                transform.position = new Vector3(0f, 5f, 0f);
+            }
+        }
+        
+#if UNITY_5_4_OR_NEWER
+        private void OnDisable()
+        {
+            OnDisable();
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+#endif        
         private void Awake()
         {
+            if (photonView.IsMine)
+            {
+                PlayerManager.LocalPlayerInstance = this.gameObject;
+            }
+            
+            DontDestroyOnLoad(this.gameObject);
+            
             if (beams == null)
             {
                 Debug.LogError("Missing Beams Reference.", this);
@@ -57,19 +93,26 @@ namespace ChandlerLane.Scripts
 
         private void Start()
         {
-            CameraWork _cameraWork = this.gameObject.GetComponent<CameraWork>();
+            CameraWork cameraWork = this.gameObject.GetComponent<CameraWork>();
 
-            if (_cameraWork != null)
+            if (cameraWork != null)
             {
                 if (photonView.IsMine)
                 {
-                    _cameraWork.OnStartFollowing();
+                    cameraWork.OnStartFollowing();
                 }
             }
             else
             {
                 Debug.LogError("<color=Red><a>Missing</a></Color> Camera component on Player prefab", this);
             }
+            
+#if UNITY_5_4_OR_NEWER
+            
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoaded;
+
+#endif
+
         }
 
         private void Update()
@@ -124,7 +167,6 @@ namespace ChandlerLane.Scripts
         }
 
         #endregion
-        // Start is called before the first frame update
 
         #region Custom
 
@@ -149,8 +191,18 @@ namespace ChandlerLane.Scripts
         
         #endregion
 
+        #region Private Methods
         
+        #if UNITY_5_4_OR_NEWER
+
+        void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene,
+            UnityEngine.SceneManagement.LoadSceneMode loadingMode)
+        {
+            this.CalledOnLevelWasLoaded(scene.buildIndex);
+        }
         
+        #endif
+        #endregion
     }    
 }
 

@@ -77,9 +77,19 @@ namespace ChandlerLane.Scripts
             {
                 Debug.LogError("PhotonNetwork : Trying to load a level but we are not the master Client");
             }
+
+
+            if (PlayerManager.LocalPlayerInstance == null)
+            {
+                Debug.LogFormat("PhotonNetwork : Loading level : {0}", PhotonNetwork.CurrentRoom.PlayerCount);
+                PhotonNetwork.LoadLevel("Room for " + PhotonNetwork.CurrentRoom.PlayerCount);    
+            }
+            else
+            {
+                Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
+            }
+
             
-            Debug.LogFormat("PhotonNetwork : Loading level : {0}", PhotonNetwork.CurrentRoom.PlayerCount);
-            PhotonNetwork.LoadLevel("Room for " + PhotonNetwork.CurrentRoom.PlayerCount);
         }
 
         #endregion
