@@ -16,6 +16,8 @@ namespace ChandlerLane.Scripts
 
         public static GameManager Instance;
 
+        public GameObject playerPrefab;
+
         #endregion
 
         #region MonoBehavior Callbacks
@@ -23,6 +25,16 @@ namespace ChandlerLane.Scripts
         private void Start()
         {
             Instance = this;
+
+            if (playerPrefab == null)
+            {
+                Debug.LogError("<Color=Red><a>Missing</a></Color> PlayerPrefab Reference");
+            }
+            else
+            {
+                Debug.LogFormat("We are Instantianting LocalPlayer from {0}", Application.loadedLevelName);
+                PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 5f, 0f), Quaternion.identity, 0);
+            }
         }
 
         #endregion
