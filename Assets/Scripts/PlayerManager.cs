@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace ChandlerLane.Scripts
 {
-    public class PlayerManager : MonoBehaviourPun
+    public class PlayerManager : MonoBehaviourPun, IPunObservable
     {
         #region Private Fields
 
@@ -20,6 +20,26 @@ namespace ChandlerLane.Scripts
 
         #endregion
 
+        #region IPunObservable implementation
+
+        public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        {
+            if (stream.IsWriting)
+            {
+                //we own this player: send the others our data
+                stream.SendNext(_isFiring);
+                stream.SendNext(health);
+            }
+            else
+            {
+                // Network player, receive data
+                this._isFiring = (bool) stream.ReceiveNext();
+                this.health = (float) stream.ReceiveNext();
+            }
+        }
+
+        #endregion
+        
         #region MonoBehaviour Callbacks
 
         private void Awake()
@@ -54,7 +74,12 @@ namespace ChandlerLane.Scripts
 
         private void Update()
         {
-            ProcessInputs();
+            if (photonView.IsMine)
+            {
+                ProcessInputs();    
+            }
+
+            
 
             if (health < 0f)
             {
@@ -124,6 +149,8 @@ namespace ChandlerLane.Scripts
         
         #endregion
 
+        
+        
     }    
 }
 
