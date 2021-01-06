@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
@@ -10,6 +11,22 @@ namespace ChandlerLane.Scripts
 {
     public class GameManager : MonoBehaviourPunCallbacks
     {
+
+        #region Public Fields
+
+        public static GameManager Instance;
+
+        #endregion
+
+        #region MonoBehavior Callbacks
+
+        private void Start()
+        {
+            Instance = this;
+        }
+
+        #endregion
+        
         #region Photon Callbacks
 
         public override void OnLeftRoom()

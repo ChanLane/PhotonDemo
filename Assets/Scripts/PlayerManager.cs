@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
 namespace ChandlerLane.Scripts
@@ -12,7 +13,16 @@ namespace ChandlerLane.Scripts
         [Tooltip("The Beams GameObject to control")] [SerializeField]
         private GameObject beams;
 
-        private bool IsFiring;
+        private bool _isFiring;
+        #endregion
+
+        private PhotonView View;
+
+        #region Public Fields
+        
+        [Tooltip("The current Health of our Player")]
+        public float health = 1f;
+
         #endregion
 
         #region MonoBehaviour Callbacks
@@ -29,16 +39,50 @@ namespace ChandlerLane.Scripts
             }
             
         }
-
         private void Update()
         {
             ProcessInputs();
+
+            if (health < 0f)
+            {
+                GameManager.Instance.LeaveRoom();
+            }
             
             // trigger Beams active state
-            if (beams != null && IsFiring != beams.activeInHierarchy)
+            if (beams != null && _isFiring != beams.activeInHierarchy)
             {
-                beams.SetActive(IsFiring);
+                beams.SetActive(_isFiring);
             }
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (!View.IsMine)
+            {
+                return;
+            }
+
+            if (!other.name.Contains("Beam"))
+            {
+               return;    
+            }
+
+            health -= 0.1f;
+        }
+
+        private void OnTriggerStay(Collider other)
+        {
+            if (!View.IsMine)
+            {
+                return;
+            }
+
+            if (other.name.Contains("Beam"))
+            {
+                return;
+            }
+
+            health -= 0.1f * Time.deltaTime;
         }
 
         #endregion
@@ -50,17 +94,17 @@ namespace ChandlerLane.Scripts
         {
             if (Input.GetButtonDown("Fire1"))
             {
-                if (!IsFiring)
+                if (!_isFiring)
                 {
-                    IsFiring = true;
+                    _isFiring = true;
                 }
             }
 
             if (Input.GetButtonUp("Fire1"))
             {
-                if (IsFiring)
+                if (_isFiring)
                 {
-                    IsFiring = false;
+                    _isFiring = false;
                 }
             }
         }
