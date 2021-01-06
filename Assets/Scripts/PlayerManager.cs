@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace ChandlerLane.Scripts
 {
-    public class PlayerManager : MonoBehaviour
+    public class PlayerManager : MonoBehaviourPun
     {
         #region Private Fields
 
@@ -14,11 +14,6 @@ namespace ChandlerLane.Scripts
         private GameObject beams;
 
         private bool _isFiring;
-        #endregion
-
-        private PhotonView View;
-
-        #region Public Fields
         
         [Tooltip("The current Health of our Player")]
         public float health = 1f;
@@ -39,6 +34,24 @@ namespace ChandlerLane.Scripts
             }
             
         }
+
+        private void Start()
+        {
+            CameraWork _cameraWork = this.gameObject.GetComponent<CameraWork>();
+
+            if (_cameraWork != null)
+            {
+                if (photonView.IsMine)
+                {
+                    _cameraWork.OnStartFollowing();
+                }
+            }
+            else
+            {
+                Debug.LogError("<color=Red><a>Missing</a></Color> Camera component on Player prefab", this);
+            }
+        }
+
         private void Update()
         {
             ProcessInputs();
@@ -57,7 +70,7 @@ namespace ChandlerLane.Scripts
 
         private void OnTriggerEnter(Collider other)
         {
-            if (!View.IsMine)
+            if (photonView.IsMine)
             {
                 return;
             }
@@ -72,7 +85,7 @@ namespace ChandlerLane.Scripts
 
         private void OnTriggerStay(Collider other)
         {
-            if (!View.IsMine)
+            if (!photonView.IsMine)
             {
                 return;
             }
